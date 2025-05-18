@@ -1068,23 +1068,23 @@ input[type="submit"]:hover {
 
     .edu-details {
         min-height: 170px;
-        min-width: 245px;
+        min-width: 225px;
+    }
+    .contact-box {
+        /* width: 350px; */
+        height: 220px;
+        padding: 10px;
     }
 
     .edu-details::before {
         width: 20%;
     }
 
-    .contact-box {
-        width: 370px;
-        height: 220px;
-    }
+    
 
-    .lets-work-section {
-        width: 100%;
-        height: 100%;
-        background-color: #000;
-        padding: 0px;
+
+    .edu-entries {
+        width: 350px;
     }
 
 
@@ -1101,7 +1101,7 @@ input[type="submit"]:hover {
 
     .work-timeline {
 
-        max-width: 380px;
+        max-width: 350px;
     }
 
     .card {
@@ -1131,5 +1131,6 @@ input[type="submit"]:hover {
 
     .right-side {
         width: 90%;
+        padding: 0px;
     }
 }
