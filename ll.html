@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Universal Carousel</title>
+  <style>
+    .carousel-container {
+      width: 400px;
+      height: 400px;
+      overflow: hidden;
+      position: relative;
+      border-radius: 10px;
+      margin: 40px auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    .carousel-images {
+      display: flex;
+      height: 100%;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .carousel-images img {
+      width: 400px;
+      height: 400px;
+      flex-shrink: 0;
+      object-fit: cover;
+      cursor: pointer;
+    }
+
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      z-index: 1;
+    }
+
+    .left-btn { left: 10px; }
+    .right-btn { right: 10px; }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.9);
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 1000;
+    }
+
+    .overlay img {
+      max-width: 90%;
+      max-height: 80%;
+      border-radius: 10px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 40px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .overlay-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: none;
+      font-size: 30px;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .overlay-left { left: 50px; }
+    .overlay-right { right: 50px; }
+  </style>
+</head>
+<body>
+
+<h2 style="text-align:center">Carousel A (Top)</h2>
+<div class="carousel-container" data-carousel>
+  <div class="carousel-images">
+    <img src="https://picsum.photos/id/1015/400/400" />
+    <img src="https://picsum.photos/id/1016/400/400" />
+    <img src="https://picsum.photos/id/1018/400/400" />
+  </div>
+  <button class="carousel-btn left-btn">❮</button>
+  <button class="carousel-btn right-btn">❯</button>
+</div>
+
+<h2 style="text-align:center">Carousel B (Middle)</h2>
+<div class="carousel-container" data-carousel>
+  <div class="carousel-images">
+    <img src="https://picsum.photos/id/1020/400/400" />
+    <img src="https://picsum.photos/id/1024/400/400" />
+    <img src="https://picsum.photos/id/1025/400/400" />
+  </div>
+  <button class="carousel-btn left-btn">❮</button>
+  <button class="carousel-btn right-btn">❯</button>
+</div>
+
+<h2 style="text-align:center">Carousel C (Bottom)</h2>
+<div class="carousel-container" data-carousel>
+  <div class="carousel-images">
+    <img src="https://picsum.photos/id/1030/400/400" />
+    <img src="https://picsum.photos/id/1035/400/400" />
+    <img src="https://picsum.photos/id/1040/400/400" />
+  </div>
+  <button class="carousel-btn left-btn">❮</button>
+  <button class="carousel-btn right-btn">❯</button>
+</div>
+
+<!-- Shared Overlay -->
+<div class="overlay" id="overlay">
+  <span class="close-btn" onclick="closeOverlay()">×</span>
+  <button class="overlay-btn overlay-left" onclick="prevOverlay()">❮</button>
+  <img id="overlayImg" src="" />
+  <button class="overlay-btn overlay-right" onclick="nextOverlay()">❯</button>
+</div>
+
+<script>
+  const carousels = document.querySelectorAll('[data-carousel]');
+  const overlay = document.getElementById('overlay');
+  const overlayImg = document.getElementById('overlayImg');
+
+  let overlayImages = [];
+  let overlayIndex = 0;
+  let overlayInterval = null;
+
+  carousels.forEach(container => {
+    const imagesContainer = container.querySelector('.carousel-images');
+    const images = container.querySelectorAll('img');
+    let index = 0;
+
+    const showImage = () => {
+      imagesContainer.style.transform = `translateX(-${index * 400}px)`;
+    };
+
+    const next = () => {
+      index = (index + 1) % images.length;
+      showImage();
+    };
+
+    const prev = () => {
+      index = (index - 1 + images.length) % images.length;
+      showImage();
+    };
+
+    container.querySelector('.left-btn').addEventListener('click', prev);
+    container.querySelector('.right-btn').addEventListener('click', next);
+
+    setInterval(next, 3000);
+
+    images.forEach((img, i) => {
+      img.addEventListener('click', () => {
+        // THIS container's images only
+        overlayImages = Array.from(container.querySelectorAll('img')).map(el => el.src);
+        overlayIndex = i;
+        showOverlayImage();
+        overlay.style.display = 'flex';
+        startOverlayInterval();
+      });
+    });
+  });
+
+  function showOverlayImage() {
+    overlayImg.src = overlayImages[overlayIndex];
+  }
+
+  function nextOverlay() {
+    overlayIndex = (overlayIndex + 1) % overlayImages.length;
+    showOverlayImage();
+    resetOverlayInterval();
+  }
+
+  function prevOverlay() {
+    overlayIndex = (overlayIndex - 1 + overlayImages.length) % overlayImages.length;
+    showOverlayImage();
+    resetOverlayInterval();
+  }
+
+  function closeOverlay() {
+    overlay.style.display = 'none';
+    clearInterval(overlayInterval);
+  }
+
+  function startOverlayInterval() {
+    overlayInterval = setInterval(() => {
+      nextOverlay();
+    }, 10000);
+  }
+
+  function resetOverlayInterval() {
+    clearInterval(overlayInterval);
+    startOverlayInterval();
+  }
+</script>
+
+</body>
+</html>
